@@ -26,14 +26,23 @@ const authenticationMiddleware = (
       req.id = decodedToken.id;
       next();
     } else {
-        req.id = 0;
-        res.status(401).json("Unauthorized!");
+      req.id = 0;
+      res.status(401).json("Unauthorized!");
     }
   } catch (err) {
     req.id = 0;
     res.status(500).json("Error authenticating!");
   }
 };
+
+balikpapanRouter.get("/", authenticationMiddleware, async (req, res) => {
+  try {
+    const response = await balikpapanService.getAllBalikpapanData();
+    res.status(response.code).json(response.response);
+  } catch (err) {
+    res.status(500).json("Internal server error!");
+  }
+});
 
 balikpapanRouter.get(
   "/nik/:nik",
@@ -49,5 +58,63 @@ balikpapanRouter.get(
     }
   }
 );
+
+balikpapanRouter.get(
+  "/nkk/:nkk",
+  authenticationMiddleware,
+  async (req, res) => {
+    try {
+      const response = await balikpapanService.getBalikpapanDataByNKK(
+        req.params.nkk
+      );
+      res.status(response.code).json(response.response);
+    } catch (err) {
+      res.status(500).json("Internal server error!");
+    }
+  }
+);
+
+// balikpapanRouter.get("/", authenticationMiddleware, async (req, res) => {
+//   try {
+//     const response = await balikpapanService.getBalikpapanDataByRT(
+//       req.params.rt as string,
+//       req.params.kel as string,
+//       req.params.kec as string,
+//     );
+//     res.status(response.code).json(response.response);
+//   } catch (err) {
+//     res.status(500).json("Internal server error!");
+//   }
+// });
+
+// balikpapanRouter.get(
+//   "/kel/:kel",
+//   authenticationMiddleware,
+//   async (req, res) => {
+//     try {
+//       const response = await balikpapanService.getBalikpapanDataByKelurahan(
+//         req.params.kel
+//       );
+//       res.status(response.code).json(response.response);
+//     } catch (err) {
+//       res.status(500).json("Internal server error!");
+//     }
+//   }
+// );
+
+// balikpapanRouter.get(
+//   "/kec/:kec",
+//   authenticationMiddleware,
+//   async (req, res) => {
+//     try {
+//       const response = await balikpapanService.getBalikpapanDataByKelurahan(
+//         req.params.kec
+//       );
+//       res.status(response.code).json(response.response);
+//     } catch (err) {
+//       res.status(500).json("Internal server error!");
+//     }
+//   }
+// );
 
 export { balikpapanRouter };
